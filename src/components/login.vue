@@ -36,10 +36,12 @@ export default {
       const res = await this.$http.post(`login`, this.formdata);
     //   console.log(res);
       const {
-        data,
+        data: {token},
         meta: { msg, status }
       } = res.data;
       if (status === 200) {
+        //   保存token
+        localStorage.setItem("token",token);
         //   跳转首页home
         this.$router.push({
             path: '/'
