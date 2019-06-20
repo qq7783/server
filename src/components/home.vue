@@ -9,7 +9,7 @@
           <h1>后台管理系统</h1>
         </el-col>
         <el-col :span="1">
-          <a href>退出</a>
+          <a href="#" @click="logout()">退出</a>
         </el-col>
       </el-row>
     </el-header>
@@ -70,6 +70,17 @@ export default {
             this.$router.push({
                 path: '/login'
             })
+        }
+    },
+    methods: {
+        logout () {  
+            // 清除token
+            localStorage.clear('token');
+            this.$router.push({
+                path: "/login"
+            });
+            // 提示退出成功
+            this.$message.warning('退出成功');
         }
     }
 };
