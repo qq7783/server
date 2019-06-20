@@ -18,7 +18,11 @@
       <el-table-column prop="username" label="姓名" width="120"></el-table-column>
       <el-table-column prop="email" label="邮箱" width="160"></el-table-column>
       <el-table-column prop="mobile" label="电话" width="160"></el-table-column>
-      <el-table-column prop="create_time" label="创建日期" width="180"></el-table-column>
+      <el-table-column label="创建日期" width="180">
+        <template slot-scope="scope">
+          {{scope.row.create_time|formdata}}
+        </template>
+      </el-table-column>
       <el-table-column prop="mg_state" label="用户状态" width="100"></el-table-column>
       <el-table-column prop="address" label="操作" width="120"></el-table-column>
     </el-table>
