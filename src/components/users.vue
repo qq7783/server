@@ -19,11 +19,13 @@
       <el-table-column prop="email" label="邮箱" width="160"></el-table-column>
       <el-table-column prop="mobile" label="电话" width="160"></el-table-column>
       <el-table-column label="创建日期" width="180">
+        <template slot-scope="scope">{{scope.row.create_time|formdata}}</template>
+      </el-table-column>
+      <el-table-column label="用户状态" width="100">
         <template slot-scope="scope">
-          {{scope.row.create_time|formdata}}
+          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </template>
       </el-table-column>
-      <el-table-column prop="mg_state" label="用户状态" width="100"></el-table-column>
       <el-table-column prop="address" label="操作" width="120"></el-table-column>
     </el-table>
     <!-- 分页 -->
@@ -46,7 +48,7 @@ export default {
       currentPage4: 4,
       query: "", //查询
       pagenum: 1, //当前页码
-      pagesize: 3 // 每页显示条数
+      pagesize: 3, // 每页显示条数
     };
   },
   created() {
@@ -65,8 +67,11 @@ export default {
         }`
       );
       // console.log(res);
-      const {data, meta: {msg, status}} = res.data;
-      if (status===200) {
+      const {
+        data,
+        meta: { msg, status }
+      } = res.data;
+      if (status === 200) {
         this.tableData = data.users;
       }
     }
