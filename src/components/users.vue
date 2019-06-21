@@ -35,7 +35,7 @@
       <el-table-column prop="address" label="操作" width="180">
         <template slot-scope="scope">
           <el-row>
-            <el-button type="primary" icon="el-icon-edit" plain circle size="small"></el-button>
+            <el-button @click="showEdit(scope.row)" type="primary" icon="el-icon-edit" plain circle size="small"></el-button>
             <el-button
               @click="showdelect(scope.row)"
               type="danger"
@@ -81,6 +81,24 @@
         <el-button type="primary" @click="addUser()">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 编辑用户对话框 -->
+    <el-dialog title="编辑用户" :visible.sync="dialogFormVisibleEdit">
+      <el-form :model="formdata">
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input v-model="formdata.username" autocomplete="off" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" :label-width="formLabelWidth">
+          <el-input v-model="formdata.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" :label-width="formLabelWidth">
+          <el-input v-model="formdata.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleEdit = false">取 消</el-button>
+        <el-button type="primary" @click="editUser()">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -94,6 +112,7 @@ export default {
       pagesize: 1, // 每页显示条数
       total: -1,
       dialogFormVisibleAdd: false,
+      dialogFormVisibleEdit: false,
       formLabelWidth: "120px",
       // 表单数据
       formdata: {
@@ -168,31 +187,49 @@ export default {
         this.formdata = {};
       }
     },
-    // 显示删除对话框
-    showdelect (user) {
+    // 显示删除对话框 与函数发请求
+    showdelect(user) {
       console.log(user);
-      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async () => {
+      this.$confirm("此操作将永久删除该用户, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
           const res = await this.$http.delete(`users/${user.id}`);
           this.$message({
-            type: 'success',
-            message: '删除成功!'
+            type: "success",
+            message: "删除成功!"
           });
           this.getTableData();
           this.pagenum = 1;
-        }).catch(() => {
+        })
+        .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+            type: "info",
+            message: "已取消删除"
+          });
         });
     },
-    // 删除用户函数发请求
-    async deleUser () {
-      const res = await this.$http.delete(`users/:id`)
+    // 显示编辑用户对话框
+    async showEdit (user) {
+      this.dialogFormVisibleEdit = true;
+      // console.log(user);
+      // 根据id发请求获取里面的参数 在赋值
+      const res = await this.$http.put(`users/${user.id}`);
+      this.formdata = res.data.data;
+      // this.formdata = user;
+    },
+    // 编辑用户函数 发请求
+    async editUser () {
+      const res = await this.$http.put(`users/${this.formdata.id}`,this.formdata)
+      console.log(res);
+      const {meta: {msg, status}} = res.data;
+      if (status === 200) {
+        this.dialogFormVisibleEdit = false;
+        this.getTableData();
+        this.pagenum = 1;
+      }
     }
   }
 };
