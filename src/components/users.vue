@@ -7,8 +7,8 @@
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 输入框 -->
-    <el-input placeholder="请输入内容" v-model="input5" class="input-with-select">
-      <el-button slot="append" icon="el-icon-search"></el-button>
+    <el-input @clear="getAllusers()" clearable placeholder="请输入内容" v-model="query" class="input-with-select">
+      <el-button slot="append" icon="el-icon-search" @click="selectUser()"></el-button>
     </el-input>
     <!-- 按钮 -->
     <el-button type="primary" plain>添加用户</el-button>
@@ -55,7 +55,6 @@ export default {
   data() {
     return {
       tableData: [],
-      input5: "",
       query: "", //查询
       pagenum: 1, //当前页码
       pagesize: 1, // 每页显示条数
@@ -89,7 +88,7 @@ export default {
           this.pagesize
         }`
       );
-      console.log(res);
+      // console.log(res);
       const {
         data,
         meta: { msg, status }
@@ -99,6 +98,16 @@ export default {
         this.total = data.total;
         this.tableData = data.users;
       }
+    },
+    // 查询用户
+    selectUser () {
+      this.pagenum = 1;
+      this.getTableData();
+    },
+    // 清空搜索框获取所有信息
+    getAllusers() {
+      this.getTableData();
+      
     }
   }
 };
