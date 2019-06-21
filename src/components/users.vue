@@ -29,13 +29,25 @@
       </el-table-column>
       <el-table-column label="用户状态" width="100">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          <el-switch
+            @change="changeUser(scope.row)"
+            v-model="scope.row.mg_state"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          ></el-switch>
         </template>
       </el-table-column>
       <el-table-column prop="address" label="操作" width="180">
         <template slot-scope="scope">
           <el-row>
-            <el-button @click="showEdit(scope.row)" type="primary" icon="el-icon-edit" plain circle size="small"></el-button>
+            <el-button
+              @click="showEdit(scope.row)"
+              type="primary"
+              icon="el-icon-edit"
+              plain
+              circle
+              size="small"
+            ></el-button>
             <el-button
               @click="showdelect(scope.row)"
               type="danger"
@@ -44,7 +56,14 @@
               circle
               size="small"
             ></el-button>
-            <el-button type="success" icon="el-icon-check" plain circle size="small"></el-button>
+            <el-button
+              @click="showsole(scope.row)"
+              type="success"
+              icon="el-icon-check"
+              plain
+              circle
+              size="small"
+            ></el-button>
           </el-row>
         </template>
       </el-table-column>
@@ -99,6 +118,23 @@
         <el-button type="primary" @click="editUser()">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" :visible.sync="dialogFormVisibleSole">
+      <el-form :model="formdata">
+        <el-form-item label="用户名" :label-width="formLabelWidth">{{formdata.username}}</el-form-item>
+        <el-form-item label="角色" :label-width="formLabelWidth">
+          {{selectAll}}
+          <el-select v-model="selectAll" placeholder="请选择角色">
+            <el-option label="请选择" :value="-1"></el-option>
+            <el-option v-for="(item, i) in roles" :key="i" :label="item.roleName" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleSole = false">取 消</el-button>
+        <el-button type="primary" @click="editroles()">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -113,6 +149,7 @@ export default {
       total: -1,
       dialogFormVisibleAdd: false,
       dialogFormVisibleEdit: false,
+      dialogFormVisibleSole: false,
       formLabelWidth: "120px",
       // 表单数据
       formdata: {
@@ -120,7 +157,11 @@ export default {
         password: "",
         email: "",
         mobile: ""
-      }
+      },
+      selectAll: -1,
+      currUserId: -1,
+      // 角色数组
+      roles: []
     };
   },
   created() {
@@ -172,6 +213,7 @@ export default {
     // 显示添加用户对话框
     showAddUser() {
       this.dialogFormVisibleAdd = true;
+      this.formdata = {};
     },
     // 添加用户函数请求
     async addUser() {
@@ -212,7 +254,7 @@ export default {
         });
     },
     // 显示编辑用户对话框
-    async showEdit (user) {
+    async showEdit(user) {
       this.dialogFormVisibleEdit = true;
       // console.log(user);
       // 根据id发请求获取里面的参数 在赋值
@@ -221,14 +263,64 @@ export default {
       // this.formdata = user;
     },
     // 编辑用户函数 发请求
-    async editUser () {
-      const res = await this.$http.put(`users/${this.formdata.id}`,this.formdata)
+    async editUser() {
+      const res = await this.$http.put(
+        `users/${this.formdata.id}`,
+        this.formdata
+      );
       console.log(res);
-      const {meta: {msg, status}} = res.data;
+      const {
+        meta: { msg, status }
+      } = res.data;
       if (status === 200) {
         this.dialogFormVisibleEdit = false;
         this.getTableData();
         this.pagenum = 1;
+      }
+    },
+    // 修改用户状态
+    async changeUser(user) {
+      // console.log(user);
+      const res = await this.$http.put(
+        `users/${user.id}/state/${user.mg_state}`
+      );
+      // console.log(res);
+      const {
+        meta: { msg, status }
+      } = res.data;
+      if (status === 200) {
+        this.getTableData();
+        // this.pagenum = 1;
+      }
+    },
+    // 显示分配角色对话框
+    async showsole(user) {
+      this.dialogFormVisibleSole = true;
+      // console.log(user);
+      this.formdata = user;
+      this.currUserId = user.id;
+      // 获取所有角色
+      const roles = await this.$http.get(`roles`);
+      // console.log(roles);
+      this.roles = roles.data.data;
+      // console.log(roles);
+      const res1 = await this.$http.put(`users/${user.id}`);
+      // console.log(res1);
+      this.selectAll = res1.data.data.role_id;
+    },
+    // 修改角色
+    async editroles() {
+      const res = await this.$http.put(`users/${this.currUserId}/role`, {
+        rid: this.selectAll
+      });
+      // console.log(res);
+      const {
+        meta: { msg, status }
+      } = res.data;
+      if (status === 200) {
+        // 关闭
+        this.dialogFormVisibleSole = false;
+        // this.formdata = {};
       }
     }
   }
