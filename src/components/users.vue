@@ -36,13 +36,14 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- 分页 -->
+    <!-- 分页  current-page 当前的页码-->
     <el-pagination
-      :current-page="currentPage4"
-      :page-sizes="[3, 6, 9, 12]"
+      class="page"
+      :current-page="pagenum"
+      :page-sizes="[1, 3, 5,]"
       :page-size="100"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
     ></el-pagination>
   </el-card>
 </template>
@@ -53,10 +54,10 @@ export default {
     return {
       tableData: [],
       input5: "",
-      currentPage4: 4,
       query: "", //查询
       pagenum: 1, //当前页码
-      pagesize: 3 // 每页显示条数
+      pagesize: 3, // 每页显示条数
+      total: -1
     };
   },
   created() {
@@ -74,12 +75,14 @@ export default {
           this.pagesize
         }`
       );
-      // console.log(res);
+      console.log(res);
       const {
         data,
         meta: { msg, status }
       } = res.data;
       if (status === 200) {
+        // 保存total
+        this.total = data.total;
         this.tableData = data.users;
       }
     }
@@ -93,6 +96,9 @@ export default {
 }
 .input-with-select {
   width: 330px;
+  padding-top: 20px;
+}
+.page {
   padding-top: 20px;
 }
 </style>
