@@ -39,6 +39,8 @@
     <!-- 分页  current-page 当前的页码-->
     <el-pagination
       class="page"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       :current-page="pagenum"
       :page-sizes="[1, 3, 5,]"
       :page-size="100"
@@ -56,7 +58,7 @@ export default {
       input5: "",
       query: "", //查询
       pagenum: 1, //当前页码
-      pagesize: 3, // 每页显示条数
+      pagesize: 1, // 每页显示条数
       total: -1
     };
   },
@@ -64,6 +66,18 @@ export default {
     this.getTableData();
   },
   methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+      this.pagenum = 1;
+      this.pagesize = val;
+      this.getTableData();
+      
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+      this.pagenum = val;
+      this.getTableData();
+    },
     // 获取列表
     async getTableData() {
       // 设置请求头 授权
