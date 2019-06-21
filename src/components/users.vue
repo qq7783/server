@@ -36,7 +36,14 @@
         <template slot-scope="scope">
           <el-row>
             <el-button type="primary" icon="el-icon-edit" plain circle size="small"></el-button>
-            <el-button type="danger" icon="el-icon-delete" plain circle size="small"></el-button>
+            <el-button
+              @click="showdelect(scope.row)"
+              type="danger"
+              icon="el-icon-delete"
+              plain
+              circle
+              size="small"
+            ></el-button>
             <el-button type="success" icon="el-icon-check" plain circle size="small"></el-button>
           </el-row>
         </template>
@@ -160,6 +167,32 @@ export default {
         // 清空表单
         this.formdata = {};
       }
+    },
+    // 显示删除对话框
+    showdelect (user) {
+      console.log(user);
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const res = await this.$http.delete(`users/${user.id}`);
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          this.getTableData();
+          this.pagenum = 1;
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+    },
+    // 删除用户函数发请求
+    async deleUser () {
+      const res = await this.$http.delete(`users/:id`)
     }
   }
 };
