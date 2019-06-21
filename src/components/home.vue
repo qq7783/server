@@ -29,7 +29,7 @@
               <span>权限管理</span>
             </template>
             <el-menu-item index="1-1">角色列表</el-menu-item>
-            <el-menu-item index="1-2">权限列表</el-menu-item>
+            <el-menu-item index="rights">权限列表</el-menu-item>
           </el-submenu>
           <el-submenu index="3">
             <template slot="title">
