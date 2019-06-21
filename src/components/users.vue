@@ -26,16 +26,24 @@
           <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </template>
       </el-table-column>
-      <el-table-column prop="address" label="操作" width="120"></el-table-column>
+      <el-table-column prop="address" label="操作" width="180">
+        <template slot-scope="scope">
+          <el-row>
+            <el-button type="primary" icon="el-icon-edit" plain circle size="small"></el-button>
+            <el-button type="danger" icon="el-icon-delete" plain circle size="small"></el-button>
+            <el-button type="success" icon="el-icon-check" plain circle size="small"></el-button>
+          </el-row>
+        </template>
+      </el-table-column>
     </el-table>
     <!-- 分页 -->
-    <!-- <el-pagination
+    <el-pagination
       :current-page="currentPage4"
-      :page-sizes="[100, 200, 300, 400]"
+      :page-sizes="[3, 6, 9, 12]"
       :page-size="100"
       layout="total, sizes, prev, pager, next, jumper"
       :total="400"
-    ></el-pagination>-->
+    ></el-pagination>
   </el-card>
 </template>
 
@@ -48,7 +56,7 @@ export default {
       currentPage4: 4,
       query: "", //查询
       pagenum: 1, //当前页码
-      pagesize: 3, // 每页显示条数
+      pagesize: 3 // 每页显示条数
     };
   },
   created() {
