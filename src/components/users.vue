@@ -7,11 +7,17 @@
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 输入框 -->
-    <el-input @clear="getAllusers()" clearable placeholder="请输入内容" v-model="query" class="input-with-select">
+    <el-input
+      @clear="getAllusers()"
+      clearable
+      placeholder="请输入内容"
+      v-model="query"
+      class="input-with-select"
+    >
       <el-button slot="append" icon="el-icon-search" @click="selectUser()"></el-button>
     </el-input>
     <!-- 按钮 -->
-    <el-button type="primary" plain>添加用户</el-button>
+    <el-button type="primary" plain @click="showAddUser()">添加用户</el-button>
     <!-- 表格 -->
     <el-table :data="tableData" style="width: 100%">
       <el-table-column prop="id" label="#" width="60"></el-table-column>
@@ -47,6 +53,27 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
     ></el-pagination>
+    <!-- 添加用户对话框 -->
+    <el-dialog title="添加用户" :visible.sync="dialogFormVisibleAdd">
+      <el-form :model="formdata">
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input v-model="formdata.username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" :label-width="formLabelWidth">
+          <el-input v-model="formdata.password" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" :label-width="formLabelWidth">
+          <el-input v-model="formdata.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" :label-width="formLabelWidth">
+          <el-input v-model="formdata.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleAdd = false">取 消</el-button>
+        <el-button type="primary" @click="addUser()">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -58,7 +85,16 @@ export default {
       query: "", //查询
       pagenum: 1, //当前页码
       pagesize: 1, // 每页显示条数
-      total: -1
+      total: -1,
+      dialogFormVisibleAdd: false,
+      formLabelWidth: "120px",
+      // 表单数据
+      formdata: {
+        username: "",
+        password: "",
+        email: "",
+        mobile: ""
+      }
     };
   },
   created() {
@@ -66,14 +102,13 @@ export default {
   },
   methods: {
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      // console.log(`每页 ${val} 条`);
       this.pagenum = 1;
       this.pagesize = val;
       this.getTableData();
-      
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      // console.log(`当前页: ${val}`);
       this.pagenum = val;
       this.getTableData();
     },
@@ -100,14 +135,31 @@ export default {
       }
     },
     // 查询用户
-    selectUser () {
+    selectUser() {
       this.pagenum = 1;
       this.getTableData();
     },
     // 清空搜索框获取所有信息
     getAllusers() {
       this.getTableData();
-      
+    },
+    // 显示添加用户对话框
+    showAddUser() {
+      this.dialogFormVisibleAdd = true;
+    },
+    // 添加用户函数请求
+    async addUser() {
+      const res = await this.$http.post(`users`, this.formdata);
+      console.log(res);
+      const {
+        meta: { status }
+      } = res.data;
+      if (status === 201) {
+        this.dialogFormVisibleAdd = false;
+        this.getTableData();
+        // 清空表单
+        this.formdata = {};
+      }
     }
   }
 };
